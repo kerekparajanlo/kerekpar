@@ -1,40 +1,42 @@
 'use client';
 
-import dynamic from 'next/dynamic';
-
-// Dinamikusan töltjük be a Player-t, hogy ne keresse a 'document'-et a szerveren
-const Player = dynamic(
-  () => import('@lottiefiles/react-lottie-player').then((mod) => mod.Player),
-  { ssr: false }
-);
-
 export default function LoadingScreen() {
   return (
-    <div className="fixed inset-0 bg-white/95 backdrop-blur-sm z-50 flex flex-col items-center justify-center p-6 text-center">
+    <div className="fixed inset-0 bg-white z-50 flex flex-col items-center justify-center p-6">
       
-      {/* Animált Biciklis - Csak kliens oldalon fog megjelenni */}
-      <div className="w-64 h-64 md:w-80 md:h-80">
-        <Player
-          autoplay
-          loop
-          src="https://lottie.host/9f5c3575-d2f6-455c-a5b5-e655938479e0/9K4C43XNxF.json"
-          style={{ height: '100%', width: '100%' }}
-        />
+      {/* Brutál egyszerű, de szép egyedi spinner */}
+      <div className="relative w-24 h-24">
+        {/* Külső piros kör */}
+        <div className="absolute inset-0 border-4 border-gray-100 rounded-full"></div>
+        
+        {/* Forgó piros ív (mint egy gyorsuló kerék) */}
+        <div className="absolute inset-0 border-4 border-t-[#ff0000] border-r-transparent border-b-transparent border-l-transparent rounded-full animate-spin"></div>
+        
+        {/* Belső pulzáló bringa ikon (emoji, de CSS-sel megbolondítva) */}
+        <div className="absolute inset-0 flex items-center justify-center animate-pulse">
+          <span className="text-4xl">🚴</span>
+        </div>
       </div>
-      
-      {/* Szöveges visszajelzés */}
-      <div className="mt-8 space-y-3">
-        <h2 className="text-3xl font-black tracking-tighter text-black">
-          Keressük a <span className="text-[#ff0000]">Tökéletes</span> Gépet
+
+      {/* Szöveg animációval */}
+      <div className="mt-12 text-center space-y-4">
+        <h2 className="text-2xl font-black tracking-tighter text-black uppercase italic">
+          Gép <span className="text-[#ff0000]">konfigurálása</span> folyamatban
         </h2>
-        <p className="text-gray-500 font-medium max-w-xs mx-auto">
-          Mérnökeink épp összevetik az adataidat a legújabb Kross modellekkel...
+        
+        <div className="flex justify-center gap-1">
+          <div className="w-2 h-2 bg-[#ff0000] rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+          <div className="w-2 h-2 bg-[#ff0000] rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+          <div className="w-2 h-2 bg-[#ff0000] rounded-full animate-bounce"></div>
+        </div>
+
+        <p className="text-gray-400 text-[10px] font-black tracking-[0.2em] uppercase">
+          Kross mérnöki adatok betöltése...
         </p>
       </div>
-      
-      {/* Bento-stílusú dekorációs elemek */}
-      <div className="absolute bottom-10 left-10 w-20 h-20 bg-gray-50 rounded-full opacity-50" />
-      <div className="absolute top-20 right-10 w-32 h-32 bg-[#ff0000]/5 rounded-full" />
+
+      {/* Háttér dekoráció hogy ne legyen üres */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-32 bg-gray-50 -rotate-12 -z-10" />
     </div>
   );
 }
