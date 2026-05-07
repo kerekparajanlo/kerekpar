@@ -12,7 +12,7 @@ export default function LoadingScreen() {
         {/* Forgó piros ív (mint egy gyorsuló kerék) */}
         <div className="absolute inset-0 border-4 border-t-[#ff0000] border-r-transparent border-b-transparent border-l-transparent rounded-full animate-spin"></div>
         
-        {/* Belső pulzáló bringa ikon (emoji, de CSS-sel megbolondítva) */}
+        {/* Belső pulzáló bringa ikon */}
         <div className="absolute inset-0 flex items-center justify-center animate-pulse">
           <span className="text-4xl">🚴</span>
         </div>
@@ -21,7 +21,7 @@ export default function LoadingScreen() {
       {/* Szöveg animációval */}
       <div className="mt-12 text-center space-y-4">
         <h2 className="text-2xl font-black tracking-tighter text-black uppercase italic">
-          Gép <span className="text-[#ff0000]">konfigurálása</span> folyamatban
+          Kerékpár <span className="text-[#ff0000]">keresése</span> folyamatban
         </h2>
         
         <div className="flex justify-center gap-1">
@@ -35,7 +35,7 @@ export default function LoadingScreen() {
         </p>
       </div>
 
-      {/* Háttér dekoráció hogy ne legyen üres */}
+      {/* Háttér dekoráció */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-32 bg-gray-50 -rotate-12 -z-10" />
     </div>
   );
