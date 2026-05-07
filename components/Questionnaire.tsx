@@ -4,10 +4,7 @@ import { useState, useMemo } from 'react';
 import { FormData } from '@/lib/types';
 import { dealersList } from '@/lib/dealers';
 import { bikes } from '@/lib/bikes';
-import dynamic from 'next/dynamic';
-
-// Dinamikus betöltés, hogy elkerüljük a build hibát
-const LoadingScreen = dynamic(() => import('./LoadingScreen'), { ssr: false });
+import LoadingScreen from './LoadingScreen';
 
 const card = 'p-3 rounded-xl border-2 text-left transition-all duration-200 cursor-pointer w-full bg-white';
 const on   = 'border-[#ff0000] shadow-[0_4px_20px_rgba(255,0,0,0.14)]';
@@ -29,7 +26,7 @@ export default function Questionnaire({ onSubmit }: { onSubmit: (d: FormData) =>
   const [errors, setErrors] = useState<Partial<FormData>>({});
   const [search, setSearch] = useState('');
   const [drop, setDrop] = useState(false);
-  const [isLoading, setIsLoading] = useState(false); // ÚJ: Töltési állapot
+  const [isLoading, setIsLoading] = useState(false);
 
   const filtered = useMemo(
     () => allCities.filter(c => c.toLowerCase().includes(search.toLowerCase())),
@@ -48,12 +45,14 @@ export default function Questionnaire({ onSubmit }: { onSubmit: (d: FormData) =>
     setErrors(err);
     
     if (!Object.keys(err).length) {
-      setIsLoading(true); // Animáció indítása
+      // Bekapcsoljuk az animációt
+      setIsLoading(true);
       
-      // 6.5 másodperc várakozás a látvány kedvéért
+      // 6.5 másodperc múlva adjuk át az adatokat a Results-nak
       setTimeout(() => {
         onSubmit(form);
-        setIsLoading(false);
+        // Itt NEM állítjuk le az isLoading-ot, mert a szülő Page.tsx 
+        // ekkor már le fogja cserélni ezt az egész komponenst a Results-ra.
       }, 6500);
     }
   };
@@ -67,7 +66,7 @@ export default function Questionnaire({ onSubmit }: { onSubmit: (d: FormData) =>
         : 'border-gray-200 focus:border-gray-400'
     }`;
 
-  // Ha töltünk, az animációt mutatjuk a teljes form helyett
+  // Ha töltünk, csak az animáció látszik
   if (isLoading) {
     return <LoadingScreen />;
   }
@@ -75,9 +74,8 @@ export default function Questionnaire({ onSubmit }: { onSubmit: (d: FormData) =>
   return (
     <form onSubmit={handleSubmit}>
 
-      {/* Row 1 — Style + Frame side by side */}
+      {/* 1. Sor — Stílus és Váz */}
       <div className="grid grid-cols-2 gap-4 mb-5">
-
         <div>
           <span className={lbl}>Stílus</span>
           <div className="grid grid-cols-2 gap-2">
@@ -117,10 +115,9 @@ export default function Questionnaire({ onSubmit }: { onSubmit: (d: FormData) =>
             ))}
           </div>
         </div>
-
       </div>
 
-      {/* Row 2 — Price */}
+      {/* 2. Sor — Ár csúszka */}
       <div className="mb-5">
         <span className={lbl}>Maximális ár</span>
         <div className="flex items-baseline gap-2 mb-3">
@@ -141,9 +138,8 @@ export default function Questionnaire({ onSubmit }: { onSubmit: (d: FormData) =>
         </div>
       </div>
 
-      {/* Row 3 — City + Email side by side */}
+      {/* 3. Sor — Város és Email */}
       <div className="grid grid-cols-2 gap-4 mb-5">
-
         <div>
           <span className={lbl}>Város</span>
           <div className="relative">
@@ -156,7 +152,7 @@ export default function Questionnaire({ onSubmit }: { onSubmit: (d: FormData) =>
               className={inputCls('city')}
             />
             {drop && filtered.length > 0 && (
-              <ul className="absolute top-full left-0 right-0 mt-1.5 bg-white/95 backdrop-blur-2xl border border-gray-100 rounded-2xl shadow-[0_16px_48px_rgba(0,0,0,0.1)] z-20 max-h-44 overflow-y-auto">
+              <ul className="absolute top-full left-0 right-0 mt-1.5 bg-white border border-gray-100 rounded-2xl shadow-[0_16px_48px_rgba(0,0,0,0.1)] z-20 max-h-44 overflow-y-auto">
                 {filtered.map(city => (
                   <li key={city}>
                     <button
@@ -167,7 +163,7 @@ export default function Questionnaire({ onSubmit }: { onSubmit: (d: FormData) =>
                         setDrop(false);
                         setErrors(er => ({ ...er, city: undefined }));
                       }}
-                      className="w-full text-left px-4 py-2 text-sm font-semibold text-black hover:bg-gray-50 transition-colors first:rounded-t-2xl last:rounded-b-2xl"
+                      className="w-full text-left px-4 py-2 text-sm font-semibold text-black hover:bg-gray-50 transition-colors"
                     >
                       {city}
                     </button>
@@ -175,9 +171,7 @@ export default function Questionnaire({ onSubmit }: { onSubmit: (d: FormData) =>
                 ))}
               </ul>
             )}
-            {errors.city && (
-              <p className="mt-1.5 text-xs font-bold text-red-500">{errors.city}</p>
-            )}
+            {errors.city && <p className="mt-1.5 text-xs font-bold text-red-500">{errors.city}</p>}
           </div>
         </div>
 
@@ -192,17 +186,14 @@ export default function Questionnaire({ onSubmit }: { onSubmit: (d: FormData) =>
             }}
             className={inputCls('email')}
           />
-          {errors.email && (
-            <p className="mt-1.5 text-xs font-bold text-red-500">{errors.email}</p>
-          )}
+          {errors.email && <p className="mt-1.5 text-xs font-bold text-red-500">{errors.email}</p>}
         </div>
-
       </div>
 
-      {/* Submit */}
+      {/* Küldés gomb */}
       <button
         type="submit"
-        className="w-full py-4 bg-[#ff0000] text-white font-black text-sm tracking-[0.2em] uppercase rounded-xl shadow-[0_8px_32px_rgba(255,0,0,0.3)] hover:shadow-[0_12px_40px_rgba(255,0,0,0.4)] hover:bg-red-600 active:scale-[0.99] transition-all duration-200"
+        className="w-full py-4 bg-[#ff0000] text-white font-black text-sm tracking-[0.2em] uppercase rounded-xl shadow-[0_8px_32px_rgba(255,0,0,0.3)] hover:bg-red-600 active:scale-[0.99] transition-all duration-200"
       >
         Kerékpár keresése →
       </button>
