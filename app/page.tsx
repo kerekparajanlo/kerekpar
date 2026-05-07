@@ -4,24 +4,31 @@ import { useState } from 'react';
 import Header from '@/components/Header';
 import Questionnaire from '@/components/Questionnaire';
 import Results from '@/components/Results';
+import LoadingScreen from '@/components/LoadingScreen';
 import { FormData, SubmissionData } from '@/lib/types';
 import { bikes } from '@/lib/bikes';
 
 export default function Home() {
   const [submittedData, setSubmittedData] = useState<SubmissionData | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = (formData: FormData) => {
     const filtered = bikes.filter(
       b => b.style === formData.style && b.frame === formData.frame && b.price <= formData.maxPrice
     );
-    if (filtered.length > 0) {
-      const bike = filtered[Math.floor(Math.random() * filtered.length)];
+    if (filtered.length === 0) return;
+    const bike = filtered[Math.floor(Math.random() * filtered.length)];
+
+    setIsLoading(true);
+    setTimeout(() => {
       setSubmittedData({ ...formData, selectedBike: bike });
-    }
+      setIsLoading(false);
+    }, 6500);
   };
 
   return (
     <div className="bg-[#f8f8f8]">
+      {isLoading && <LoadingScreen />}
       <Header />
       <main className="max-w-3xl mx-auto w-full px-4 sm:px-6 py-5">
         {!submittedData ? (
