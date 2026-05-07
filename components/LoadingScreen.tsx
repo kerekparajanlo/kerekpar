@@ -1,18 +1,28 @@
 'use client';
 
-import { Player } from '@lottiefiles/react-lottie-player';
+import dynamic from 'next/dynamic';
+
+// Dinamikusan töltjük be a Player-t, hogy ne keresse a 'document'-et a szerveren
+const Player = dynamic(
+  () => import('@lottiefiles/react-lottie-player').then((mod) => mod.Player),
+  { ssr: false }
+);
 
 export default function LoadingScreen() {
   return (
     <div className="fixed inset-0 bg-white/95 backdrop-blur-sm z-50 flex flex-col items-center justify-center p-6 text-center">
-
-      <Player
-        autoplay
-        loop
-        src="https://lottie.host/9f5c3575-d2f6-455c-a5b5-e655938479e0/9K4C43XNxF.json"
-        className="w-64 h-64 md:w-80 md:h-80"
-      />
-
+      
+      {/* Animált Biciklis - Csak kliens oldalon fog megjelenni */}
+      <div className="w-64 h-64 md:w-80 md:h-80">
+        <Player
+          autoplay
+          loop
+          src="https://lottie.host/9f5c3575-d2f6-455c-a5b5-e655938479e0/9K4C43XNxF.json"
+          style={{ height: '100%', width: '100%' }}
+        />
+      </div>
+      
+      {/* Szöveges visszajelzés */}
       <div className="mt-8 space-y-3">
         <h2 className="text-3xl font-black tracking-tighter text-black">
           Keressük a <span className="text-[#ff0000]">Tökéletes</span> Gépet
@@ -21,7 +31,8 @@ export default function LoadingScreen() {
           Mérnökeink épp összevetik az adataidat a legújabb Kross modellekkel...
         </p>
       </div>
-
+      
+      {/* Bento-stílusú dekorációs elemek */}
       <div className="absolute bottom-10 left-10 w-20 h-20 bg-gray-50 rounded-full opacity-50" />
       <div className="absolute top-20 right-10 w-32 h-32 bg-[#ff0000]/5 rounded-full" />
     </div>
