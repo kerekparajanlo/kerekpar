@@ -133,4 +133,102 @@ export default function Questionnaire({ onSubmit }: { onSubmit: (d: FormData) =>
           <span className={lbl}>Stílus</span>
           <div className="grid grid-cols-1 gap-2">
             {([
-              { val: 'comfortable
+              { val: 'comfortable', icon: '🛣️', name: 'Komfortos', sub: 'kerékpár' },
+              { val: 'sporty',      icon: '⚡',  name: 'Sportos',   sub: 'kerékpár' },
+            ] as const).map(o => (
+              <button
+                key={o.val} type="button"
+                onClick={() => setForm(f => ({ ...f, style: o.val }))}
+                className={`${card} ${form.style === o.val ? on : off} flex items-center gap-3`}
+              >
+                <span className="text-xl">{o.icon}</span>
+                <div>
+                    <span className="block text-xs font-black text-black uppercase tracking-tight">{o.name}</span>
+                    <span className="block text-[10px] text-gray-500 uppercase font-bold">{o.sub}</span>
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <span className={lbl}>Váz típusa</span>
+          <div className="grid grid-cols-1 gap-2">
+            {([
+              { val: 'male',   icon: '♂', name: 'FÉRFI', sub: 'Hagyományos' },
+              { val: 'female', icon: '♀', name: 'NŐI',   sub: 'Nyitott'     },
+            ] as const).map(o => (
+              <button
+                key={o.val} type="button"
+                onClick={() => setForm(f => ({ ...f, frame: o.val }))}
+                className={`${card} ${form.frame === o.val ? on : off} flex items-center gap-3`}
+              >
+                <span className="text-2xl leading-none">{o.icon}</span>
+                <div>
+                    <span className="block text-xs font-black text-black uppercase tracking-tight">{o.name}</span>
+                    <span className="block text-[10px] text-gray-500 uppercase font-bold">{o.sub}</span>
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* 2. Sor — Ár */}
+      <div className="mb-5">
+        <span className={lbl}>Maximális ár</span>
+        <div className="flex items-baseline gap-2 mb-3">
+          <span className="text-4xl font-black tracking-tighter text-black leading-none">
+            {(form.maxPrice / 1000).toFixed(0)}
+          </span>
+          <span className="text-sm font-bold text-gray-400 uppercase tracking-widest">ezer Ft</span>
+        </div>
+        <input
+          type="range" min={0} max={maxPrice} value={form.maxPrice}
+          onChange={e => setForm(f => ({ ...f, maxPrice: +e.target.value }))}
+          style={{ background: `linear-gradient(to right,#ff0000 ${pct}%,#e5e5e5 ${pct}%)` }}
+          className="w-full h-1.5 rounded-lg appearance-none cursor-pointer"
+        />
+      </div>
+
+      {/* 3. Sor — Település és Email */}
+      <div className="grid grid-cols-2 gap-4 mb-5">
+        <div>
+          <span className={lbl}>Település (Bármilyen magyar)</span>
+          <input
+            type="text" placeholder="pl. Máriakálnok..."
+            value={form.city}
+            onChange={e => {
+              setForm(f => ({ ...f, city: e.target.value }));
+              setErrors(er => ({ ...er, city: undefined }));
+            }}
+            className={inputCls('city')}
+          />
+          {errors.city && <p className="mt-1.5 text-[10px] font-bold text-red-500 uppercase">{errors.city}</p>}
+        </div>
+
+        <div>
+          <span className={lbl}>E-mail cím</span>
+          <input
+            type="email" placeholder="pelda@email.hu"
+            value={form.email}
+            onChange={e => {
+              setForm(f => ({ ...f, email: e.target.value }));
+              setErrors(er => ({ ...er, email: undefined }));
+            }}
+            className={inputCls('email')}
+          />
+          {errors.email && <p className="mt-1.5 text-[10px] font-bold text-red-500 uppercase">{errors.email}</p>}
+        </div>
+      </div>
+
+      <button
+        type="submit"
+        className="w-full py-4 bg-[#ff0000] text-white font-black text-sm tracking-[0.2em] uppercase rounded-xl shadow-[0_8px_32px_rgba(255,0,0,0.3)] hover:bg-black transition-all duration-300"
+      >
+        Kerékpár keresése →
+      </button>
+
+    </form>
+  );
+}
