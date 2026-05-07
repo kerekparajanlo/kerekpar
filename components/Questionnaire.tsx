@@ -13,6 +13,9 @@ const lbl  = 'text-[10px] font-black tracking-[0.3em] uppercase text-[#ff0000] m
 
 export default function Questionnaire({ onSubmit }: { onSubmit: (d: FormData) => void }) {
   const maxPrice = useMemo(() => Math.max(...bikes.map(b => b.price)), []);
+  
+  // Most már az összes magyar település listáját használhatnánk, 
+  // de kezdésnek az összes olyan várost mutatjuk, ahol van KROSS partner.
   const allCities = useMemo(() => [...new Set(dealersList.map(d => d.city))].sort(), []);
 
   const [form, setForm] = useState<FormData>({
@@ -38,38 +41,26 @@ export default function Questionnaire({ onSubmit }: { onSubmit: (d: FormData) =>
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const err: Partial<FormData> = {};
-    if (!form.city) err.city = 'Kötelező';
-    if (!form.email) err.email = 'Kötelező';
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) err.email = 'Érvénytelen';
+    if (!form.city) err.city = 'Kötelező megadni a települést';
+    if (!form.email) err.email = 'Kötelező megadni az e-mail címet';
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) err.email = 'Érvénytelen formátum';
     
     setErrors(err);
     
     if (!Object.keys(err).length) {
-      // Bekapcsoljuk az animációt
       setIsLoading(true);
-      
-      // 6.5 másodperc múlva adjuk át az adatokat a Results-nak
       setTimeout(() => {
         onSubmit(form);
-        // Itt NEM állítjuk le az isLoading-ot, mert a szülő Page.tsx 
-        // ekkor már le fogja cserélni ezt az egész komponenst a Results-ra.
       }, 6500);
     }
   };
 
   const inputCls = (field: keyof FormData) =>
     `w-full px-3 py-3 rounded-xl border-2 bg-white text-black font-semibold text-sm outline-none transition-colors ${
-      errors[field]
-        ? 'border-red-500'
-        : form[field]
-        ? 'border-[#ff0000]'
-        : 'border-gray-200 focus:border-gray-400'
+      errors[field] ? 'border-red-500' : form[field] ? 'border-[#ff0000]' : 'border-gray-200 focus:border-gray-400'
     }`;
 
-  // Ha töltünk, csak az animáció látszik
-  if (isLoading) {
-    return <LoadingScreen />;
-  }
+  if (isLoading) return <LoadingScreen />;
 
   return (
     <form onSubmit={handleSubmit}>
@@ -78,19 +69,21 @@ export default function Questionnaire({ onSubmit }: { onSubmit: (d: FormData) =>
       <div className="grid grid-cols-2 gap-4 mb-5">
         <div>
           <span className={lbl}>Stílus</span>
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-1 gap-2">
             {([
-              { val: 'comfortable', icon: '🛣️', name: 'TRANS', sub: 'Kényelmes' },
-              { val: 'sporty',      icon: '⚡',  name: 'EVADO', sub: 'Sportos'   },
+              { val: 'comfortable', icon: '🛣️', name: 'Komfortos', sub: 'kerékpár' },
+              { val: 'sporty',      icon: '⚡',  name: 'Sportos',   sub: 'kerékpár' },
             ] as const).map(o => (
               <button
                 key={o.val} type="button"
                 onClick={() => setForm(f => ({ ...f, style: o.val }))}
-                className={`${card} ${form.style === o.val ? on : off}`}
+                className={`${card} ${form.style === o.val ? on : off} flex items-center gap-3`}
               >
-                <span className="text-xl block mb-1.5">{o.icon}</span>
-                <span className="block text-xs font-black text-black">{o.name}</span>
-                <span className="block text-[10px] text-gray-500 mt-0.5">{o.sub}</span>
+                <span className="text-xl">{o.icon}</span>
+                <div>
+                    <span className="block text-xs font-black text-black uppercase tracking-tight">{o.name}</span>
+                    <span className="block text-[10px] text-gray-500 uppercase font-bold">{o.sub}</span>
+                </div>
               </button>
             ))}
           </div>
@@ -98,7 +91,7 @@ export default function Questionnaire({ onSubmit }: { onSubmit: (d: FormData) =>
 
         <div>
           <span className={lbl}>Váz típusa</span>
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-1 gap-2">
             {([
               { val: 'male',   icon: '♂', name: 'FÉRFI', sub: 'Hagyományos' },
               { val: 'female', icon: '♀', name: 'NŐI',   sub: 'Nyitott'     },
@@ -106,25 +99,27 @@ export default function Questionnaire({ onSubmit }: { onSubmit: (d: FormData) =>
               <button
                 key={o.val} type="button"
                 onClick={() => setForm(f => ({ ...f, frame: o.val }))}
-                className={`${card} ${form.frame === o.val ? on : off}`}
+                className={`${card} ${form.frame === o.val ? on : off} flex items-center gap-3`}
               >
-                <span className="text-2xl block mb-1.5 leading-none">{o.icon}</span>
-                <span className="block text-xs font-black text-black">{o.name}</span>
-                <span className="block text-[10px] text-gray-500 mt-0.5">{o.sub}</span>
+                <span className="text-2xl leading-none">{o.icon}</span>
+                <div>
+                    <span className="block text-xs font-black text-black uppercase tracking-tight">{o.name}</span>
+                    <span className="block text-[10px] text-gray-500 uppercase font-bold">{o.sub}</span>
+                </div>
               </button>
             ))}
           </div>
         </div>
       </div>
 
-      {/* 2. Sor — Ár csúszka */}
+      {/* 2. Sor — Ár */}
       <div className="mb-5">
         <span className={lbl}>Maximális ár</span>
         <div className="flex items-baseline gap-2 mb-3">
           <span className="text-4xl font-black tracking-tighter text-black leading-none">
             {(form.maxPrice / 1000).toFixed(0)}
           </span>
-          <span className="text-sm font-bold text-gray-400">ezer Ft</span>
+          <span className="text-sm font-bold text-gray-400 uppercase tracking-widest">ezer Ft</span>
         </div>
         <input
           type="range" min={0} max={maxPrice} value={form.maxPrice}
@@ -132,19 +127,15 @@ export default function Questionnaire({ onSubmit }: { onSubmit: (d: FormData) =>
           style={{ background: `linear-gradient(to right,#ff0000 ${pct}%,#e5e5e5 ${pct}%)` }}
           className="w-full h-1.5 rounded-lg appearance-none cursor-pointer"
         />
-        <div className="flex justify-between mt-2 text-[11px] font-semibold text-gray-400">
-          <span>0 Ft</span>
-          <span>{(maxPrice / 1000).toFixed(0)} 000 Ft</span>
-        </div>
       </div>
 
-      {/* 3. Sor — Város és Email */}
+      {/* 3. Sor — Település és Email */}
       <div className="grid grid-cols-2 gap-4 mb-5">
         <div>
-          <span className={lbl}>Város</span>
+          <span className={lbl}>Település</span>
           <div className="relative">
             <input
-              type="text" placeholder="Keresés..."
+              type="text" placeholder="Kezdd el írni..."
               value={search}
               onChange={e => { setSearch(e.target.value); setForm(f => ({ ...f, city: '' })); }}
               onFocus={() => setDrop(true)}
@@ -163,7 +154,7 @@ export default function Questionnaire({ onSubmit }: { onSubmit: (d: FormData) =>
                         setDrop(false);
                         setErrors(er => ({ ...er, city: undefined }));
                       }}
-                      className="w-full text-left px-4 py-2 text-sm font-semibold text-black hover:bg-gray-50 transition-colors"
+                      className="w-full text-left px-4 py-2.5 text-sm font-bold text-black hover:bg-red-50 hover:text-[#ff0000] transition-colors"
                     >
                       {city}
                     </button>
@@ -171,14 +162,14 @@ export default function Questionnaire({ onSubmit }: { onSubmit: (d: FormData) =>
                 ))}
               </ul>
             )}
-            {errors.city && <p className="mt-1.5 text-xs font-bold text-red-500">{errors.city}</p>}
+            {errors.city && <p className="mt-1.5 text-[10px] font-bold text-red-500 uppercase">{errors.city}</p>}
           </div>
         </div>
 
         <div>
-          <span className={lbl}>E-mail</span>
+          <span className={lbl}>E-mail cím</span>
           <input
-            type="email" placeholder="te@email.com"
+            type="email" placeholder="pelda@email.hu"
             value={form.email}
             onChange={e => {
               setForm(f => ({ ...f, email: e.target.value }));
@@ -186,14 +177,13 @@ export default function Questionnaire({ onSubmit }: { onSubmit: (d: FormData) =>
             }}
             className={inputCls('email')}
           />
-          {errors.email && <p className="mt-1.5 text-xs font-bold text-red-500">{errors.email}</p>}
+          {errors.email && <p className="mt-1.5 text-[10px] font-bold text-red-500 uppercase">{errors.email}</p>}
         </div>
       </div>
 
-      {/* Küldés gomb */}
       <button
         type="submit"
-        className="w-full py-4 bg-[#ff0000] text-white font-black text-sm tracking-[0.2em] uppercase rounded-xl shadow-[0_8px_32px_rgba(255,0,0,0.3)] hover:bg-red-600 active:scale-[0.99] transition-all duration-200"
+        className="w-full py-4 bg-[#ff0000] text-white font-black text-sm tracking-[0.2em] uppercase rounded-xl shadow-[0_8px_32px_rgba(255,0,0,0.3)] hover:bg-black transition-all duration-300"
       >
         Kerékpár keresése →
       </button>
