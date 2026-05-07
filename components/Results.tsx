@@ -1,8 +1,10 @@
 'use client';
 
+import { useEffect } from 'react';
 import { Bike, FormData } from '@/lib/types';
 import { dealersList } from '@/lib/dealers';
 import ImageSlider from './ImageSlider';
+import { supabase } from '@/lib/supabase';
 
 interface ResultsProps {
   bike: Bike;
@@ -11,6 +13,15 @@ interface ResultsProps {
 
 export default function Results({ bike, formData }: ResultsProps) {
   const dealers = dealersList.filter(d => d.city === formData.city);
+
+  useEffect(() => {
+    supabase.from('leads').insert({
+      email: formData.email,
+      bike_name: bike.name,
+      city: formData.city,
+      gender: formData.frame,
+    });
+  }, []);
 
   return (
     <div className="space-y-2.5">
