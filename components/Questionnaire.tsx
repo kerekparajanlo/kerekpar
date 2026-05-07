@@ -2,7 +2,6 @@
 
 import { useState, useMemo } from 'react';
 import { FormData } from '@/lib/types';
-import { dealersList } from '@/lib/dealers';
 import { bikes } from '@/lib/bikes';
 import LoadingScreen from './LoadingScreen';
 
@@ -18,7 +17,7 @@ const getDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => 
   return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
 };
 
-// A Te Exceled alapján a KROSS boltok városainak fix koordinátái
+// A KROSS boltok városainak fix koordinátái (68 település)
 const dealerCoords: Record<string, [number, number]> = {
   "Érd": [47.3804, 18.9139], "Kisújszállás": [47.2186, 20.7622], "Karcag": [47.3167, 20.9333],
   "Budapest": [47.4979, 19.0402], "Nyíregyháza": [47.9554, 21.7167], "Ajka": [47.1000, 17.5667],
@@ -79,8 +78,8 @@ export default function Questionnaire({ onSubmit }: { onSubmit: (d: FormData) =>
       const startTime = Date.now();
 
       try {
-        // Ingyenes keresés a térképen a júzer által beírt településre
-        const res = await fetch(`https://nominatim.openstreetmap.org/search?city=${encodeURIComponent(form.city)}&country=Hungary&format=json`);
+        // Általános keresés a térképen a júzer által beírt településre (q= használata)
+        const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(form.city)}&countrycodes=hu&format=json`);
         const data = await res.json();
 
         let nearestCity = form.city;
@@ -194,7 +193,7 @@ export default function Questionnaire({ onSubmit }: { onSubmit: (d: FormData) =>
       {/* 3. Sor — Település és Email */}
       <div className="grid grid-cols-2 gap-4 mb-5">
         <div>
-          <span className={lbl}>Település (Bármilyen magyar)</span>
+          <span className={lbl}>Település</span>
           <input
             type="text" placeholder="pl. Máriakálnok..."
             value={form.city}
