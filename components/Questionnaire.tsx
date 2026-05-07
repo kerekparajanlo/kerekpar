@@ -4,6 +4,10 @@ import { useState, useMemo } from 'react';
 import { FormData } from '@/lib/types';
 import { dealersList } from '@/lib/dealers';
 import { bikes } from '@/lib/bikes';
+import dynamic from 'next/dynamic';
+
+// Dinamikus betöltés, hogy elkerüljük a build hibát
+const LoadingScreen = dynamic(() => import('./LoadingScreen'), { ssr: false });
 
 const card = 'p-3 rounded-xl border-2 text-left transition-all duration-200 cursor-pointer w-full bg-white';
 const on   = 'border-[#ff0000] shadow-[0_4px_20px_rgba(255,0,0,0.14)]';
@@ -21,14 +25,17 @@ export default function Questionnaire({ onSubmit }: { onSubmit: (d: FormData) =>
     email: '',
     maxPrice,
   });
+  
   const [errors, setErrors] = useState<Partial<FormData>>({});
   const [search, setSearch] = useState('');
   const [drop, setDrop] = useState(false);
+  const [isLoading, setIsLoading] = useState(false); // ÚJ: Töltési állapot
 
   const filtered = useMemo(
     () => allCities.filter(c => c.toLowerCase().includes(search.toLowerCase())),
     [search, allCities]
   );
+  
   const pct = (form.maxPrice / maxPrice) * 100;
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -37,8 +44,18 @@ export default function Questionnaire({ onSubmit }: { onSubmit: (d: FormData) =>
     if (!form.city) err.city = 'Kötelező';
     if (!form.email) err.email = 'Kötelező';
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) err.email = 'Érvénytelen';
+    
     setErrors(err);
-    if (!Object.keys(err).length) onSubmit(form);
+    
+    if (!Object.keys(err).length) {
+      setIsLoading(true); // Animáció indítása
+      
+      // 6.5 másodperc várakozás a látvány kedvéért
+      setTimeout(() => {
+        onSubmit(form);
+        setIsLoading(false);
+      }, 6500);
+    }
   };
 
   const inputCls = (field: keyof FormData) =>
@@ -49,6 +66,11 @@ export default function Questionnaire({ onSubmit }: { onSubmit: (d: FormData) =>
         ? 'border-[#ff0000]'
         : 'border-gray-200 focus:border-gray-400'
     }`;
+
+  // Ha töltünk, az animációt mutatjuk a teljes form helyett
+  if (isLoading) {
+    return <LoadingScreen />;
+  }
 
   return (
     <form onSubmit={handleSubmit}>
@@ -111,7 +133,7 @@ export default function Questionnaire({ onSubmit }: { onSubmit: (d: FormData) =>
           type="range" min={0} max={maxPrice} value={form.maxPrice}
           onChange={e => setForm(f => ({ ...f, maxPrice: +e.target.value }))}
           style={{ background: `linear-gradient(to right,#ff0000 ${pct}%,#e5e5e5 ${pct}%)` }}
-          className="w-full"
+          className="w-full h-1.5 rounded-lg appearance-none cursor-pointer"
         />
         <div className="flex justify-between mt-2 text-[11px] font-semibold text-gray-400">
           <span>0 Ft</span>
