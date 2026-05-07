@@ -15,13 +15,30 @@ export default function Results({ bike, formData }: ResultsProps) {
   const dealers = dealersList.filter(d => d.city === formData.city);
 
   useEffect(() => {
-    supabase.from('leads').insert({
-      email: formData.email,
-      bike_name: bike.name,
-      city: formData.city,
-      gender: formData.frame,
-    });
-  }, []);
+    const saveLead = async () => {
+      // Csak akkor mentsünk, ha van email (biztonsági csekk)
+      if (!formData.email) return;
+
+      const { error } = await supabase
+        .from('leads')
+        .insert([
+          {
+            email: formData.email,
+            bike_name: bike.name,
+            city: formData.city,
+            gender: formData.frame === 'male' ? 'Férfi' : 'Női',
+          }
+        ]);
+
+      if (error) {
+        console.error('Supabase mentési hiba:', error.message);
+      } else {
+        console.log('Lead sikeresen elmentve a Supabase-be!');
+      }
+    };
+
+    saveLead();
+  }, [bike.name, formData]); // Függőségek hozzáadva a biztonság kedvéért
 
   return (
     <div className="space-y-2.5">
