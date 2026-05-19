@@ -60,11 +60,11 @@ export default function Results({ bike, formData }: ResultsProps) {
           <div className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm">
             <p className="text-[10px] font-black tracking-[0.2em] uppercase text-gray-400 mb-2">Ár</p>
             <p className="text-3xl font-black tracking-tighter text-[#ff0000] leading-none">
-              {(bike.price / 1000).toFixed(0)}
-              <span className="text-sm font-bold text-gray-400 ml-1">eFt</span>
+              {new Intl.NumberFormat('hu-HU').format(bike.price)}
+              <span className="text-sm font-bold text-gray-400 ml-1">Ft</span>
             </p>
             <p className="text-xs text-gray-400 mt-2 font-semibold">
-              Max: {(formData.maxPrice / 1000).toFixed(0)} eFt
+              Max: {new Intl.NumberFormat('hu-HU').format(formData.maxPrice)} Ft
             </p>
           </div>
 
@@ -81,8 +81,9 @@ export default function Results({ bike, formData }: ResultsProps) {
             <p className="text-[10px] font-black tracking-[0.2em] uppercase text-red-200">
               Termék
             </p>
+            {/* Itt most már a konkrét kerékpár URL-jére mutat! */}
             <a
-              href={bike.type === 'trekking' ? 'https://sportokboltja.hu/trans' : 'https://sportokboltja.hu/evado'}
+              href={bike.url}
               target="_blank"
               rel="noopener noreferrer"
               className="block w-full py-3 bg-white text-[#ff0000] font-black text-xs tracking-widest uppercase rounded-xl text-center hover:bg-gray-50 transition-colors"
@@ -101,7 +102,7 @@ export default function Results({ bike, formData }: ResultsProps) {
             {bike.name}
           </h2>
           <p className="text-[10px] font-bold tracking-[0.2em] uppercase text-gray-400">
-            {bike.style === 'comfortable' ? 'Kényelmes trekking' : 'Sportos cross'}
+            {bike.style === 'comfortable' ? 'Kényelmes trekking kerékpár' : 'Sportos cross trekking kerékpár'}
           </p>
         </div>
         <span className={`shrink-0 px-3 py-1.5 text-[10px] font-black tracking-[0.2em] uppercase rounded-xl ${
