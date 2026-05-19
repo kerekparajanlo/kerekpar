@@ -224,7 +224,7 @@ export default function Questionnaire({ onSubmit }: { onSubmit: (d: FormData) =>
           className="mt-1 w-4 h-4 accent-[#ff0000] cursor-pointer" 
         />
         <label htmlFor="gdpr" className={`text-xs ${gdprError ? 'text-red-500 font-bold' : 'text-gray-500'} cursor-pointer`}>
-          Elfogadom az Adatvédelmi tájékoztatót, és hozzájárulok a megadott adataim kezeléséhez a KROSS Magyarország számára.
+          Elfogadom az Adatvédelmi tájékoztatót, és hozzájárulok a megadott adataim kezeléséhez a Hefa Bike Kft. számára.
         </label>
       </div>
 
