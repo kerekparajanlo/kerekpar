@@ -5,19 +5,15 @@ import { FormData } from '@/lib/types';
 import { bikes } from '@/lib/bikes';
 import LoadingScreen from './LoadingScreen';
 
-// Távolságkalkulátor (Haversine formula)
 const getDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
-  const R = 6371; // Föld sugara km-ben
+  const R = 6371; 
   const dLat = (lat2 - lat1) * (Math.PI / 180);
   const dLon = (lon2 - lon1) * (Math.PI / 180);
-  const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) *
-    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
   return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
 };
 
-// A KROSS boltok városainak fix koordinátái (68 település)
+// ... IDE JÖN A TE 68 ELEMES dealerCoords LISTÁD (Ugyanaz, mint eddig!) ...
 // A KROSS boltok városainak fix koordinátái
 const dealerCoords: Record<string, [number, number]> = {
   "Érd": [47.3804, 18.9139], "Kisújszállás": [47.2186, 20.7622], "Karcag": [47.3167, 20.9333],
@@ -54,6 +50,7 @@ const lbl  = 'text-[10px] font-black tracking-[0.3em] uppercase text-[#ff0000] m
 
 export default function Questionnaire({ onSubmit }: { onSubmit: (d: FormData) => void }) {
   const maxPrice = useMemo(() => Math.max(...bikes.map(b => b.price)), []);
+  const MIN_PRICE = 150000; // Csúszka minimum
   
   const [form, setForm] = useState<FormData>({
     style: 'comfortable',
@@ -64,79 +61,67 @@ export default function Questionnaire({ onSubmit }: { onSubmit: (d: FormData) =>
   });
   
   const [errors, setErrors] = useState<Partial<FormData>>({});
+  const [gdpr, setGdpr] = useState(false);
+  const [gdprError, setGdprError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const pct = (form.maxPrice / maxPrice) * 100;
+  
+  // Csúszka százalék kalkulálása a 150e minimumhoz
+  const pct = ((form.maxPrice - MIN_PRICE) / (maxPrice - MIN_PRICE)) * 100;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const err: Partial<FormData> = {};
     if (!form.city) err.city = 'Kötelező megadni a települést';
-    if (!form.email) err.email = 'Kötelező megadni az e-mail címet';
+    if (!form.email) err.email = 'Kötelező';
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) err.email = 'Érvénytelen formátum';
     
+    if (!gdpr) setGdprError(true); else setGdprError(false);
     setErrors(err);
     
-    if (!Object.keys(err).length) {
+    if (!Object.keys(err).length && gdpr) {
       setIsLoading(true);
       const startTime = Date.now();
 
       try {
-        // Általános keresés a térképen a júzer által beírt településre (q= használata)
         const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(form.city)}&countrycodes=hu&format=json`);
         const data = await res.json();
-
         let nearestCity = form.city;
 
-        // Ha megtalálta a térkép a települést
         if (data && data.length > 0) {
           const userLat = parseFloat(data[0].lat);
           const userLon = parseFloat(data[0].lon);
           let minDist = Infinity;
-
-          // Megkeressük a legközelebbi KROSS boltot
           for (const [city, coords] of Object.entries(dealerCoords)) {
             const dist = getDistance(userLat, userLon, coords[0], coords[1]);
-            if (dist < minDist) {
-              minDist = dist;
-              nearestCity = city;
-            }
+            if (dist < minDist) { minDist = dist; nearestCity = city; }
           }
         }
-
-        // Kiszámoljuk mennyi idő telt el, hogy pontosan 6.5mp legyen az animáció
+        
+        // 3 MÁSODPERCRE GYORSÍTVA
         const elapsed = Date.now() - startTime;
-        const timeLeft = Math.max(0, 6500 - elapsed);
-
-        setTimeout(() => {
-          // Elküldjük a legközelebbi város nevét a Results-nak
-          onSubmit({ ...form, city: nearestCity });
-        }, timeLeft);
+        const timeLeft = Math.max(0, 3000 - elapsed);
+        setTimeout(() => { onSubmit({ ...form, city: nearestCity }); }, timeLeft);
 
       } catch (error) {
-        // Ha elmegy a net a lekérdezés közben, simán tovább engedjük
-        setTimeout(() => onSubmit(form), 6500);
+        setTimeout(() => onSubmit(form), 3000);
       }
     }
   };
 
-  const inputCls = (field: keyof FormData) =>
-    `w-full px-3 py-3 rounded-xl border-2 bg-white text-black font-semibold text-sm outline-none transition-colors ${
-      errors[field] ? 'border-red-500' : form[field] ? 'border-[#ff0000]' : 'border-gray-200 focus:border-gray-400'
-    }`;
+  const inputCls = (field: keyof FormData) => `w-full px-3 py-3 rounded-xl border-2 bg-white text-black font-semibold text-sm outline-none transition-colors ${errors[field] ? 'border-red-500' : form[field] ? 'border-[#ff0000]' : 'border-gray-200 focus:border-gray-400'}`;
 
   if (isLoading) return <LoadingScreen />;
 
   return (
     <form onSubmit={handleSubmit}>
-
       {/* 1. Sor — Stílus és Váz */}
       <div className="grid grid-cols-2 gap-4 mb-5">
         <div>
           <span className={lbl}>Stílus</span>
           <div className="grid grid-cols-1 gap-2">
             {([
-              { val: 'comfortable', icon: '🛣️', name: 'Komfortos', sub: 'kerékpár' },
-              { val: 'sporty',      icon: '⚡',  name: 'Sportos',   sub: 'kerékpár' },
+              { val: 'comfortable', icon: '🛣️', name: 'Komfortos', sub: 'trekking kerékpár' },
+              { val: 'sporty',      icon: '⚡',  name: 'Sportos',   sub: 'cross trekking kerékpár' },
             ] as const).map(o => (
               <button
                 key={o.val} type="button"
@@ -146,14 +131,14 @@ export default function Questionnaire({ onSubmit }: { onSubmit: (d: FormData) =>
                 <span className="text-xl">{o.icon}</span>
                 <div>
                     <span className="block text-xs font-black text-black uppercase tracking-tight">{o.name}</span>
-                    <span className="block text-[10px] text-gray-500 uppercase font-bold">{o.sub}</span>
+                    <span className="block text-[9px] text-gray-500 uppercase font-bold">{o.sub}</span>
                 </div>
               </button>
             ))}
           </div>
         </div>
-
-        <div>
+        {/* ... (VÁZ TÍPUSA RÉSZ UGYANAZ MARAD, MINT EDDIG) ... */}
+         <div>
           <span className={lbl}>Váz típusa</span>
           <div className="grid grid-cols-1 gap-2">
             {([
@@ -181,20 +166,25 @@ export default function Questionnaire({ onSubmit }: { onSubmit: (d: FormData) =>
         <span className={lbl}>Maximális ár</span>
         <div className="flex items-baseline gap-2 mb-3">
           <span className="text-4xl font-black tracking-tighter text-black leading-none">
-            {(form.maxPrice / 1000).toFixed(0)}
+            {new Intl.NumberFormat('hu-HU').format(form.maxPrice)}
           </span>
-          <span className="text-sm font-bold text-gray-400 uppercase tracking-widest">ezer Ft</span>
+          <span className="text-sm font-bold text-gray-400 uppercase tracking-widest">Ft</span>
         </div>
         <input
-          type="range" min={0} max={maxPrice} value={form.maxPrice}
+          type="range" min={MIN_PRICE} max={maxPrice} step={5000} value={form.maxPrice}
           onChange={e => setForm(f => ({ ...f, maxPrice: +e.target.value }))}
           style={{ background: `linear-gradient(to right,#ff0000 ${pct}%,#e5e5e5 ${pct}%)` }}
           className="w-full h-1.5 rounded-lg appearance-none cursor-pointer"
         />
+        <div className="flex justify-between mt-2 text-[11px] font-semibold text-gray-400">
+          <span>{new Intl.NumberFormat('hu-HU').format(MIN_PRICE)} Ft</span>
+          <span>{new Intl.NumberFormat('hu-HU').format(maxPrice)} Ft</span>
+        </div>
       </div>
 
-      {/* 3. Sor — Település és Email */}
+      {/* 3. Sor — Település, Email, GDPR */}
       <div className="grid grid-cols-2 gap-4 mb-5">
+        {/* ... (TELEPÜLÉS ÉS EMAIL INPUTOK UGYANAZOK) ... */}
         <div>
           <span className={lbl}>Település</span>
           <input
@@ -223,14 +213,24 @@ export default function Questionnaire({ onSubmit }: { onSubmit: (d: FormData) =>
           {errors.email && <p className="mt-1.5 text-[10px] font-bold text-red-500 uppercase">{errors.email}</p>}
         </div>
       </div>
+      
+      {/* GDPR CHECKBOX */}
+      <div className="mb-6 flex items-start gap-3">
+        <input 
+          type="checkbox" 
+          id="gdpr" 
+          checked={gdpr} 
+          onChange={(e) => { setGdpr(e.target.checked); setGdprError(false); }}
+          className="mt-1 w-4 h-4 accent-[#ff0000] cursor-pointer" 
+        />
+        <label htmlFor="gdpr" className={`text-xs ${gdprError ? 'text-red-500 font-bold' : 'text-gray-500'} cursor-pointer`}>
+          Elfogadom az Adatvédelmi tájékoztatót, és hozzájárulok a megadott adataim kezeléséhez a KROSS Magyarország számára.
+        </label>
+      </div>
 
-      <button
-        type="submit"
-        className="w-full py-4 bg-[#ff0000] text-white font-black text-sm tracking-[0.2em] uppercase rounded-xl shadow-[0_8px_32px_rgba(255,0,0,0.3)] hover:bg-black transition-all duration-300"
-      >
+      <button type="submit" className="w-full py-4 bg-[#ff0000] text-white font-black text-sm tracking-[0.2em] uppercase rounded-xl shadow-[0_8px_32px_rgba(255,0,0,0.3)] hover:bg-black transition-all duration-300">
         Kerékpár keresése →
       </button>
-
     </form>
   );
 }
