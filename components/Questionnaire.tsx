@@ -18,6 +18,7 @@ const getDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => 
 };
 
 // A KROSS boltok városainak fix koordinátái (68 település)
+// A KROSS boltok városainak fix koordinátái
 const dealerCoords: Record<string, [number, number]> = {
   "Érd": [47.3804, 18.9139], "Kisújszállás": [47.2186, 20.7622], "Karcag": [47.3167, 20.9333],
   "Budapest": [47.4979, 19.0402], "Nyíregyháza": [47.9554, 21.7167], "Ajka": [47.1000, 17.5667],
@@ -26,8 +27,9 @@ const dealerCoords: Record<string, [number, number]> = {
   "Balatonkenese": [47.0342, 18.1008], "Siófok": [46.9041, 18.0580], "Győr": [47.6833, 17.6351],
   "Miskolc": [48.1000, 20.7833], "Kecskemét": [46.9062, 19.6913], "Felsőtárkány": [47.9736, 20.4150],
   "Szolnok": [47.1708, 20.1979], "Mosonmagyaróvár": [47.8679, 17.2694], "Balmazújváros": [47.6167, 21.3333],
-  "Eger": [47.9026, 20.3733], "Paks": [46.6250, 18.8583], "Fertőd": [47.6222, 16.8711],
-  "Keszthely": [46.7681, 15.2486], "Dombóvár": [46.3750, 18.1361], "Gyula": [46.6500, 21.2833],
+  "Gyál": [47.3833, 19.2167], "Eger": [47.9026, 20.3733], "Paks": [46.6250, 18.8583], 
+  "Fertőd": [47.6222, 16.8711], "Fertőrákos": [47.7222, 16.6667], "Keszthely": [46.7681, 15.2486], 
+  "Dombóvár": [46.3750, 18.1361], "Cegléd": [47.1733, 19.7997], "Gyula": [46.6500, 21.2833],
   "Pomáz": [47.6483, 19.0253], "Szeged": [46.2530, 20.1414], "Vác": [47.7833, 19.1333],
   "Csorna": [47.6115, 17.2497], "Tatabánya": [47.5800, 18.3975], "Debrecen": [47.5316, 21.6273],
   "Székesfehérvár": [47.1899, 18.4103], "Bordány": [46.3267, 19.9111], "Bonyhád": [46.2975, 18.5306],
@@ -39,8 +41,9 @@ const dealerCoords: Record<string, [number, number]> = {
   "Rétság": [47.9286, 19.1367], "Mohács": [45.9950, 18.6806], "Heves": [47.5992, 20.2764],
   "Békéscsaba": [46.6800, 21.0978], "Budaörs": [47.4619, 18.9525], "Pápa": [47.3300, 17.4675],
   "Kazincbarcika": [48.2533, 20.6225], "Révfülöp": [46.8286, 17.6292], "Tarján": [47.6103, 18.5083],
-  "Balatonfüred": [46.9500, 17.8833], "Tata": [47.6533, 18.3183], "Kaposvár": [46.3500, 17.7833],
-  "Salgótarján": [48.0983, 19.8050], "Dunakeszi": [47.6333, 19.1333], "Balatonlelle": [46.7869, 17.6953],
+  "Balatonfüred": [46.9500, 17.8833], "Nagykáta": [47.4167, 19.7333], "Tata": [47.6533, 18.3183], 
+  "Kaposvár": [46.3500, 17.7833], "Velence": [47.2333, 18.6500], "Salgótarján": [48.0983, 19.8050], 
+  "Kiskőrös": [46.6208, 19.2853], "Dunakeszi": [47.6333, 19.1333], "Balatonlelle": [46.7869, 17.6953],
   "Nagykanizsa": [46.4500, 16.9833], "Tát": [47.7408, 18.6472]
 };
 
