@@ -7,7 +7,7 @@ export interface Bike {
   frame: 'male' | 'female';
   price: number;
   images: string[];
-  productLink: string;
+  url: string; // <-- EZT JAVÍTOTTAM productLink-ről url-re!
 }
 
 export interface FormData {
