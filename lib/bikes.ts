@@ -1,7 +1,7 @@
 import { Bike } from './types';
 
 export const bikes: Bike[] = [
-  // Trans (Trekking - Comfortable) - Valós adatok
+  // Trans (Trekking - Comfortable)
   {
     id: 'trans-1.0-male',
     name: 'Trans 1.0',
@@ -13,7 +13,7 @@ export const bikes: Bike[] = [
     images: [
       'https://sportokboltja.hu/media/KRTR1Z28X17M002483-KR-Trans-1.0-czarny-szary-polysk-3 Nagy-525x380.jpg',
     ],
-    productLink: 'https://www.kross.pl/en/bikes/trans-1-0',
+    url: 'https://sportokboltja.hu/trans-1-0-m',
   },
   {
     id: 'trans-1.0-female',
@@ -26,7 +26,7 @@ export const bikes: Bike[] = [
     images: [
       'https://sportokboltja.hu/media/KRTR1Z28X17W007999_KR Trans 1.0 D 28 M bra_fio p-49 â nagy-525x380.jpg',
     ],
-    productLink: 'https://www.kross.pl/en/bikes/trans-1-0',
+    url: 'https://sportokboltja.hu/trans-1-0-d',
   },
   {
     id: 'trans-3.0-male',
@@ -39,7 +39,7 @@ export const bikes: Bike[] = [
     images: [
       'https://sportokboltja.hu/media/KRTR3Z28X21M008013_KR Trans 3.0 M 28 L zie_sre p-51 â nagy-1-525x380.jpg',
     ],
-    productLink: 'https://www.kross.pl/en/bikes/trans-3-0',
+    url: 'https://sportokboltja.hu/trans-3-0-m',
   },
   {
     id: 'trans-3.0-female',
@@ -52,7 +52,7 @@ export const bikes: Bike[] = [
     images: [
       'https://sportokboltja.hu/media/KRTR3Z28X17W008007_KR Trans 3.0 D 28 M bra_sre m-51 â nagy-1-525x380.jpg',
     ],
-    productLink: 'https://www.kross.pl/en/bikes/trans-3-0',
+    url: 'https://sportokboltja.hu/trans-3-0-d',
   },
   {
     id: 'trans-4.0-male',
@@ -65,7 +65,7 @@ export const bikes: Bike[] = [
     images: [
       'https://sportokboltja.hu/media/KRTR4Z28X19M008226_KR Trans 4.0 M 28 M sza_cza m-1 â nagy-525x380.jpg',
     ],
-    productLink: 'https://www.kross.pl/en/bikes/trans-4-0',
+    url: 'https://sportokboltja.hu/trans-4-0-ferfi',
   },
   {
     id: 'trans-4.0-female',
@@ -78,7 +78,7 @@ export const bikes: Bike[] = [
     images: [
       'https://sportokboltja.hu/media/KRTR4Z28X17W008224_KR Trans 4.0 D 28 M nie_cza m-1 â nagy-525x380.jpg',
     ],
-    productLink: 'https://www.kross.pl/en/bikes/trans-4-0',
+    url: 'https://sportokboltja.hu/trans-4-0-noi',
   },
   {
     id: 'trans-5.0-male',
@@ -91,7 +91,7 @@ export const bikes: Bike[] = [
     images: [
       'https://sportokboltja.hu/media/KRTR5Z28X19M008235_KR Trans 5.0 M 28 M bra_sre p-1 â nagy-2-525x380.jpg',
     ],
-    productLink: 'https://www.kross.pl/en/bikes/trans-5-0',
+    url: 'https://sportokboltja.hu/trans-5-0-ferfi',
   },
   {
     id: 'trans-5.0-female',
@@ -104,7 +104,7 @@ export const bikes: Bike[] = [
     images: [
       'https://sportokboltja.hu/media/KRTR5Z28X17W008240_KR Trans 5.0 D 28 M cze_sre p-1 â nagy-525x380.jpg',
     ],
-    productLink: 'https://www.kross.pl/en/bikes/trans-5-0',
+    url: 'https://sportokboltja.hu/trans-5-0-noi',
   },
   {
     id: 'trans-7.0-male',
@@ -117,7 +117,7 @@ export const bikes: Bike[] = [
     images: [
       'https://sportokboltja.hu/media/KRTR7Z28X19M008244_KR Trans 7.0 M 28 M cza_sre p-51 â nagy-1-525x380.jpg',
     ],
-    productLink: 'https://www.kross.pl/en/bikes/trans-7-0',
+    url: 'https://sportokboltja.hu/trans-7-0-m',
   },
   {
     id: 'trans-7.0-female',
@@ -130,10 +130,10 @@ export const bikes: Bike[] = [
     images: [
       'https://sportokboltja.hu/media/KRTR7Z28X19M008244_KR Trans 7.0 M 28 M cza_sre p-51 â nagy-2-525x380.jpg',
     ],
-    productLink: 'https://www.kross.pl/en/bikes/trans-7-0',
+    url: 'https://sportokboltja.hu/trans-7-0-d',
   },
 
-  // Evado (Cross - Sporty) - Valós adatok
+  // Evado (Cross - Sporty)
   {
     id: 'evado-2.0-male',
     name: 'Evado 2.0',
@@ -145,7 +145,7 @@ export const bikes: Bike[] = [
     images: [
       'https://sportokboltja.hu/media/KREV2Z28X19M004216-KR-Evado-2.0-czarny-niebieski-poÅysk-360-19-1750-1-525x380.jpg',
     ],
-    productLink: 'https://www.kross.pl/en/bikes/evado-2-0',
+    url: 'https://sportokboltja.hu/evado-2-0-m',
   },
   {
     id: 'evado-2.0-female',
@@ -158,7 +158,7 @@ export const bikes: Bike[] = [
     images: [
       'https://sportokboltja.hu/media/KREV2Z28X17W007930_KR Evado 2.0 D 28 M mie_cza p-47 â nagy-525x380.jpg',
     ],
-    productLink: 'https://www.kross.pl/en/bikes/evado-2-0',
+    url: 'https://sportokboltja.hu/evado-2-0-d',
   },
   {
     id: 'evado-3.0-male',
@@ -171,7 +171,7 @@ export const bikes: Bike[] = [
     images: [
       'https://sportokboltja.hu/media/KREV3Z28X19M007940_KR Evado 3.0 M 28 M sza_mor p-49 â nagy-525x380.jpg',
     ],
-    productLink: 'https://www.kross.pl/en/bikes/evado-3-0',
+    url: 'https://sportokboltja.hu/evado-3-0-m',
   },
   {
     id: 'evado-3.0-female',
@@ -184,7 +184,7 @@ export const bikes: Bike[] = [
     images: [
       'https://sportokboltja.hu/media/KREV3Z28X17W007938_KR Evado 3.0 D 28 M nie_bia p-49 â nagy-525x380.jpg',
     ],
-    productLink: 'https://www.kross.pl/en/bikes/evado-3-0',
+    url: 'https://sportokboltja.hu/evado-3-0-d',
   },
   {
     id: 'evado-4.0-male',
@@ -197,7 +197,7 @@ export const bikes: Bike[] = [
     images: [
       'https://sportokboltja.hu/media/KREV4Z28X19M007950_KR Evado 4.0 M 28 M cza_sre p-49 â nagy-525x380.jpg',
     ],
-    productLink: 'https://www.kross.pl/en/bikes/evado-4-0',
+    url: 'https://sportokboltja.hu/evado-4-0-m',
   },
   {
     id: 'evado-4.0-female',
@@ -210,7 +210,7 @@ export const bikes: Bike[] = [
     images: [
       'https://sportokboltja.hu/media/ev4_3-525x380.jpg',
     ],
-    productLink: 'https://www.kross.pl/en/bikes/evado-4-0',
+    url: 'https://sportokboltja.hu/evado-4-0-d',
   },
   {
     id: 'evado-5.0-male',
@@ -223,7 +223,7 @@ export const bikes: Bike[] = [
     images: [
       'https://sportokboltja.hu/media/KREV5Z28X19M007963_KR Evado 5.0 M 28 M gra_sre p-49 â nagy-525x380.jpg',
     ],
-    productLink: 'https://www.kross.pl/en/bikes/evado-5-0',
+    url: 'https://sportokboltja.hu/evado-5-0-m',
   },
   {
     id: 'evado-5.0-female',
@@ -236,7 +236,7 @@ export const bikes: Bike[] = [
     images: [
       'https://sportokboltja.hu/media/KREV5Z28X19W007959_KR Evado 5.0 D 28 L fio_zie p-49 â nagy-525x380.jpg',
     ],
-    productLink: 'https://www.kross.pl/en/bikes/evado-5-0',
+    url: 'https://sportokboltja.hu/evado-5-0-d',
   },
   {
     id: 'evado-7.0-male',
@@ -249,7 +249,7 @@ export const bikes: Bike[] = [
     images: [
       'https://sportokboltja.hu/media/KREV7Z28X19M007966_KR Evado 7.0 M 28 M cza_sre p-49 â nagy-525x380.jpg',
     ],
-    productLink: 'https://www.kross.pl/en/bikes/evado-7-0',
+    url: 'https://sportokboltja.hu/evado-7-0-m',
   },
   {
     id: 'evado-7.0-female',
@@ -262,6 +262,6 @@ export const bikes: Bike[] = [
     images: [
       'https://sportokboltja.hu/media/KREV7Z28X17W007969_KR Evado 7.0 D 28 M cza_fio p-49 â nagy-525x380.jpg',
     ],
-    productLink: 'https://www.kross.pl/en/bikes/evado-7-0',
+    url: 'https://sportokboltja.hu/evado-7-0-d',
   },
 ];
