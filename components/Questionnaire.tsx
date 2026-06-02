@@ -2,56 +2,18 @@
 
 import { useState, useMemo } from 'react';
 import { FormData } from '@/lib/types';
+import { dealersList, normalizeCity } from '@/lib/dealers';
 import { bikes } from '@/lib/bikes';
-import LoadingScreen from './LoadingScreen';
-
-const getDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
-  const R = 6371; 
-  const dLat = (lat2 - lat1) * (Math.PI / 180);
-  const dLon = (lon2 - lon1) * (Math.PI / 180);
-  const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
-  return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
-};
-
-// ... IDE JÖN A TE 68 ELEMES dealerCoords LISTÁD (Ugyanaz, mint eddig!) ...
-// A KROSS boltok városainak fix koordinátái
-const dealerCoords: Record<string, [number, number]> = {
-  "Érd": [47.3804, 18.9139], "Kisújszállás": [47.2186, 20.7622], "Karcag": [47.3167, 20.9333],
-  "Budapest": [47.4979, 19.0402], "Nyíregyháza": [47.9554, 21.7167], "Ajka": [47.1000, 17.5667],
-  "Szentendre": [47.6667, 19.0833], "Pécs": [46.0727, 18.2323], "Szombathely": [47.2307, 16.6214],
-  "Körmend": [47.0111, 16.6060], "Balatonalmádi": [47.0286, 18.0206], "Szentes": [46.6500, 20.2667],
-  "Balatonkenese": [47.0342, 18.1008], "Siófok": [46.9041, 18.0580], "Győr": [47.6833, 17.6351],
-  "Miskolc": [48.1000, 20.7833], "Kecskemét": [46.9062, 19.6913], "Felsőtárkány": [47.9736, 20.4150],
-  "Szolnok": [47.1708, 20.1979], "Mosonmagyaróvár": [47.8679, 17.2694], "Balmazújváros": [47.6167, 21.3333],
-  "Gyál": [47.3833, 19.2167], "Eger": [47.9026, 20.3733], "Paks": [46.6250, 18.8583], 
-  "Fertőd": [47.6222, 16.8711], "Fertőrákos": [47.7222, 16.6667], "Keszthely": [46.7681, 15.2486], 
-  "Dombóvár": [46.3750, 18.1361], "Cegléd": [47.1733, 19.7997], "Gyula": [46.6500, 21.2833],
-  "Pomáz": [47.6483, 19.0253], "Szeged": [46.2530, 20.1414], "Vác": [47.7833, 19.1333],
-  "Csorna": [47.6115, 17.2497], "Tatabánya": [47.5800, 18.3975], "Debrecen": [47.5316, 21.6273],
-  "Székesfehérvár": [47.1899, 18.4103], "Bordány": [46.3267, 19.9111], "Bonyhád": [46.2975, 18.5306],
-  "Szekszárd": [46.3474, 18.7062], "Dunaújváros": [46.9619, 18.9350], "Sopron": [47.6833, 16.5833],
-  "Gyöngyös": [47.7833, 19.9333], "Páty": [47.5133, 18.8267], "Bodajk": [47.3236, 18.2300],
-  "Budakeszi": [47.5122, 18.9286], "Dabas": [47.1833, 19.3167], "Veszprém": [47.0928, 17.9100],
-  "Kiskunfélegyháza": [46.7083, 19.8497], "Mór": [47.3739, 18.2078], "Hatvan": [47.6667, 19.6833],
-  "Komárom": [47.7389, 18.1194], "Baja": [46.1833, 18.9500], "Mátészalka": [47.9525, 22.3250],
-  "Rétság": [47.9286, 19.1367], "Mohács": [45.9950, 18.6806], "Heves": [47.5992, 20.2764],
-  "Békéscsaba": [46.6800, 21.0978], "Budaörs": [47.4619, 18.9525], "Pápa": [47.3300, 17.4675],
-  "Kazincbarcika": [48.2533, 20.6225], "Révfülöp": [46.8286, 17.6292], "Tarján": [47.6103, 18.5083],
-  "Balatonfüred": [46.9500, 17.8833], "Nagykáta": [47.4167, 19.7333], "Tata": [47.6533, 18.3183], 
-  "Kaposvár": [46.3500, 17.7833], "Velence": [47.2333, 18.6500], "Salgótarján": [48.0983, 19.8050], 
-  "Kiskőrös": [46.6208, 19.2853], "Dunakeszi": [47.6333, 19.1333], "Balatonlelle": [46.7869, 17.6953],
-  "Nagykanizsa": [46.4500, 16.9833], "Tát": [47.7408, 18.6472]
-};
 
 const card = 'p-3 rounded-xl border-2 text-left transition-all duration-200 cursor-pointer w-full bg-white';
-const on   = 'border-[#ff0000] shadow-[0_4px_20px_rgba(255,0,0,0.14)]';
-const off  = 'border-gray-200 hover:border-gray-300';
-const lbl  = 'text-[10px] font-black tracking-[0.3em] uppercase text-[#ff0000] mb-2.5 block';
+const on = 'border-[#ff0000] shadow-[0_4px_20px_rgba(255,0,0,0.14)]';
+const off = 'border-gray-200 hover:border-gray-300';
+const lbl = 'text-[10px] font-black tracking-[0.3em] uppercase text-[#ff0000] mb-2.5 block';
 
 export default function Questionnaire({ onSubmit }: { onSubmit: (d: FormData) => void }) {
   const maxPrice = useMemo(() => Math.max(...bikes.map(b => b.price)), []);
-  const MIN_PRICE = 150000; // Csúszka minimum
-  
+  const allCities = useMemo(() => [...new Set(dealersList.map(d => d.city))].sort(), []);
+
   const [form, setForm] = useState<FormData>({
     style: 'comfortable',
     frame: 'male',
@@ -59,150 +21,172 @@ export default function Questionnaire({ onSubmit }: { onSubmit: (d: FormData) =>
     email: '',
     maxPrice,
   });
-  
+
   const [errors, setErrors] = useState<Partial<FormData>>({});
-  const [gdpr, setGdpr] = useState(false);
-  const [gdprError, setGdprError] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  
-  // Csúszka százalék kalkulálása a 150e minimumhoz
-  const pct = ((form.maxPrice - MIN_PRICE) / (maxPrice - MIN_PRICE)) * 100;
+  const [search, setSearch] = useState('');
+  const [drop, setDrop] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const filtered = useMemo(
+    () => {
+      const normalizedSearch = normalizeCity(search);
+      return allCities.filter(c => normalizeCity(c).includes(normalizedSearch));
+    },
+    [search, allCities]
+  );
+
+  const pct = (form.maxPrice / maxPrice) * 100;
+
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    const matchedCity = allCities.find(c => normalizeCity(c) === normalizeCity(search));
+    const city = form.city || matchedCity || '';
+
     const err: Partial<FormData> = {};
-    if (!form.city) err.city = 'Kötelező megadni a települést';
+    if (!city) err.city = 'Kötelező';
     if (!form.email) err.email = 'Kötelező';
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) err.email = 'Érvénytelen formátum';
-    
-    if (!gdpr) setGdprError(true); else setGdprError(false);
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) err.email = 'Érvénytelen';
+
     setErrors(err);
-    
-    if (!Object.keys(err).length && gdpr) {
-      setIsLoading(true);
-      const startTime = Date.now();
 
-      try {
-        const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(form.city)}&countrycodes=hu&format=json`);
-        const data = await res.json();
-        let nearestCity = form.city;
-
-        if (data && data.length > 0) {
-          const userLat = parseFloat(data[0].lat);
-          const userLon = parseFloat(data[0].lon);
-          let minDist = Infinity;
-          for (const [city, coords] of Object.entries(dealerCoords)) {
-            const dist = getDistance(userLat, userLon, coords[0], coords[1]);
-            if (dist < minDist) { minDist = dist; nearestCity = city; }
-          }
-        }
-        
-        // 3 MÁSODPERCRE GYORSÍTVA
-        const elapsed = Date.now() - startTime;
-        const timeLeft = Math.max(0, 3000 - elapsed);
-        setTimeout(() => { onSubmit({ ...form, city: nearestCity }); }, timeLeft);
-
-      } catch (error) {
-        setTimeout(() => onSubmit(form), 3000);
-      }
+    if (!Object.keys(err).length) {
+      onSubmit({ ...form, city });
     }
   };
 
-  const inputCls = (field: keyof FormData) => `w-full px-3 py-3 rounded-xl border-2 bg-white text-black font-semibold text-sm outline-none transition-colors ${errors[field] ? 'border-red-500' : form[field] ? 'border-[#ff0000]' : 'border-gray-200 focus:border-gray-400'}`;
-
-  if (isLoading) return <LoadingScreen />;
+  const inputCls = (field: keyof FormData) =>
+    `w-full px-3 py-3 rounded-xl border-2 bg-white text-black font-semibold text-sm outline-none transition-colors ${
+      errors[field]
+        ? 'border-red-500'
+        : form[field]
+        ? 'border-[#ff0000]'
+        : 'border-gray-200 focus:border-gray-400'
+    }`;
 
   return (
     <form onSubmit={handleSubmit}>
-      {/* 1. Sor — Stílus és Váz */}
       <div className="grid grid-cols-2 gap-4 mb-5">
         <div>
           <span className={lbl}>Stílus</span>
-          <div className="grid grid-cols-1 gap-2">
+          <div className="grid grid-cols-2 gap-2">
             {([
-              { val: 'comfortable', icon: '🛣️', name: 'Komfortos', sub: 'trekking kerékpár' },
-              { val: 'sporty',      icon: '⚡',  name: 'Sportos',   sub: 'cross trekking kerékpár' },
+              { val: 'comfortable', icon: '🚲', name: 'TRANS', sub: 'Kényelmes' },
+              { val: 'sporty', icon: '⚡', name: 'EVADO', sub: 'Sportos' },
             ] as const).map(o => (
               <button
-                key={o.val} type="button"
+                key={o.val}
+                type="button"
                 onClick={() => setForm(f => ({ ...f, style: o.val }))}
-                className={`${card} ${form.style === o.val ? on : off} flex items-center gap-3`}
+                className={`${card} ${form.style === o.val ? on : off}`}
               >
-                <span className="text-xl">{o.icon}</span>
-                <div>
-                    <span className="block text-xs font-black text-black uppercase tracking-tight">{o.name}</span>
-                    <span className="block text-[9px] text-gray-500 uppercase font-bold">{o.sub}</span>
-                </div>
+                <span className="text-xl block mb-1.5">{o.icon}</span>
+                <span className="block text-xs font-black text-black">{o.name}</span>
+                <span className="block text-[10px] text-gray-500 mt-0.5">{o.sub}</span>
               </button>
             ))}
           </div>
         </div>
-        {/* ... (VÁZ TÍPUSA RÉSZ UGYANAZ MARAD, MINT EDDIG) ... */}
-         <div>
+
+        <div>
           <span className={lbl}>Váz típusa</span>
-          <div className="grid grid-cols-1 gap-2">
+          <div className="grid grid-cols-2 gap-2">
             {([
-              { val: 'male',   icon: '♂', name: 'FÉRFI', sub: 'Hagyományos' },
-              { val: 'female', icon: '♀', name: 'NŐI',   sub: 'Nyitott'     },
+              { val: 'male', icon: '♂', name: 'FÉRFI', sub: 'Hagyományos' },
+              { val: 'female', icon: '♀', name: 'NŐI', sub: 'Nyitott' },
             ] as const).map(o => (
               <button
-                key={o.val} type="button"
+                key={o.val}
+                type="button"
                 onClick={() => setForm(f => ({ ...f, frame: o.val }))}
-                className={`${card} ${form.frame === o.val ? on : off} flex items-center gap-3`}
+                className={`${card} ${form.frame === o.val ? on : off}`}
               >
-                <span className="text-2xl leading-none">{o.icon}</span>
-                <div>
-                    <span className="block text-xs font-black text-black uppercase tracking-tight">{o.name}</span>
-                    <span className="block text-[10px] text-gray-500 uppercase font-bold">{o.sub}</span>
-                </div>
+                <span className="text-2xl block mb-1.5 leading-none">{o.icon}</span>
+                <span className="block text-xs font-black text-black">{o.name}</span>
+                <span className="block text-[10px] text-gray-500 mt-0.5">{o.sub}</span>
               </button>
             ))}
           </div>
         </div>
       </div>
 
-      {/* 2. Sor — Ár */}
       <div className="mb-5">
         <span className={lbl}>Maximális ár</span>
         <div className="flex items-baseline gap-2 mb-3">
           <span className="text-4xl font-black tracking-tighter text-black leading-none">
-            {new Intl.NumberFormat('hu-HU').format(form.maxPrice)}
+            {(form.maxPrice / 1000).toFixed(0)}
           </span>
-          <span className="text-sm font-bold text-gray-400 uppercase tracking-widest">Ft</span>
+          <span className="text-sm font-bold text-gray-400">ezer Ft</span>
         </div>
+
         <input
-          type="range" min={MIN_PRICE} max={maxPrice} step={5000} value={form.maxPrice}
+          type="range"
+          min={0}
+          max={maxPrice}
+          value={form.maxPrice}
           onChange={e => setForm(f => ({ ...f, maxPrice: +e.target.value }))}
           style={{ background: `linear-gradient(to right,#ff0000 ${pct}%,#e5e5e5 ${pct}%)` }}
-          className="w-full h-1.5 rounded-lg appearance-none cursor-pointer"
+          className="w-full"
         />
+
         <div className="flex justify-between mt-2 text-[11px] font-semibold text-gray-400">
-          <span>{new Intl.NumberFormat('hu-HU').format(MIN_PRICE)} Ft</span>
-          <span>{new Intl.NumberFormat('hu-HU').format(maxPrice)} Ft</span>
+          <span>0 Ft</span>
+          <span>{(maxPrice / 1000).toFixed(0)} 000 Ft</span>
         </div>
       </div>
 
-      {/* 3. Sor — Település, Email, GDPR */}
       <div className="grid grid-cols-2 gap-4 mb-5">
-        {/* ... (TELEPÜLÉS ÉS EMAIL INPUTOK UGYANAZOK) ... */}
         <div>
-          <span className={lbl}>Település</span>
-          <input
-            type="text" placeholder="pl. Máriakálnok..."
-            value={form.city}
-            onChange={e => {
-              setForm(f => ({ ...f, city: e.target.value }));
-              setErrors(er => ({ ...er, city: undefined }));
-            }}
-            className={inputCls('city')}
-          />
-          {errors.city && <p className="mt-1.5 text-[10px] font-bold text-red-500 uppercase">{errors.city}</p>}
+          <span className={lbl}>Város</span>
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Keresés..."
+              value={search}
+              onChange={e => {
+                const value = e.target.value;
+                const matchedCity = allCities.find(c => normalizeCity(c) === normalizeCity(value));
+
+                setSearch(value);
+                setForm(f => ({ ...f, city: matchedCity || '' }));
+                setErrors(er => ({ ...er, city: matchedCity ? undefined : er.city }));
+              }}
+              onFocus={() => setDrop(true)}
+              onBlur={() => setTimeout(() => setDrop(false), 150)}
+              className={inputCls('city')}
+            />
+
+            {drop && filtered.length > 0 && (
+              <ul className="absolute top-full left-0 right-0 mt-1.5 bg-white/95 backdrop-blur-2xl border border-gray-100 rounded-2xl shadow-[0_16px_48px_rgba(0,0,0,0.1)] z-20 max-h-44 overflow-y-auto">
+                {filtered.map(city => (
+                  <li key={city}>
+                    <button
+                      type="button"
+                      onMouseDown={() => {
+                        setForm(f => ({ ...f, city }));
+                        setSearch(city);
+                        setDrop(false);
+                        setErrors(er => ({ ...er, city: undefined }));
+                      }}
+                      className="w-full text-left px-4 py-2 text-sm font-semibold text-black hover:bg-gray-50 transition-colors first:rounded-t-2xl last:rounded-b-2xl"
+                    >
+                      {city}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+
+            {errors.city && (
+              <p className="mt-1.5 text-xs font-bold text-red-500">{errors.city}</p>
+            )}
+          </div>
         </div>
 
         <div>
-          <span className={lbl}>E-mail cím</span>
+          <span className={lbl}>E-mail</span>
           <input
-            type="email" placeholder="pelda@email.hu"
+            type="email"
+            placeholder="te@email.com"
             value={form.email}
             onChange={e => {
               setForm(f => ({ ...f, email: e.target.value }));
@@ -210,25 +194,17 @@ export default function Questionnaire({ onSubmit }: { onSubmit: (d: FormData) =>
             }}
             className={inputCls('email')}
           />
-          {errors.email && <p className="mt-1.5 text-[10px] font-bold text-red-500 uppercase">{errors.email}</p>}
+
+          {errors.email && (
+            <p className="mt-1.5 text-xs font-bold text-red-500">{errors.email}</p>
+          )}
         </div>
       </div>
-      
-      {/* GDPR CHECKBOX */}
-      <div className="mb-6 flex items-start gap-3">
-        <input 
-          type="checkbox" 
-          id="gdpr" 
-          checked={gdpr} 
-          onChange={(e) => { setGdpr(e.target.checked); setGdprError(false); }}
-          className="mt-1 w-4 h-4 accent-[#ff0000] cursor-pointer" 
-        />
-        <label htmlFor="gdpr" className={`text-xs ${gdprError ? 'text-red-500 font-bold' : 'text-gray-500'} cursor-pointer`}>
-          Elfogadom az Adatvédelmi tájékoztatót, és hozzájárulok a megadott adataim kezeléséhez a Hefa Bike Kft. számára.
-        </label>
-      </div>
 
-      <button type="submit" className="w-full py-4 bg-[#ff0000] text-white font-black text-sm tracking-[0.2em] uppercase rounded-xl shadow-[0_8px_32px_rgba(255,0,0,0.3)] hover:bg-black transition-all duration-300">
+      <button
+        type="submit"
+        className="w-full py-4 bg-[#ff0000] text-white font-black text-sm tracking-[0.2em] uppercase rounded-xl shadow-[0_8px_32px_rgba(255,0,0,0.3)] hover:shadow-[0_12px_40px_rgba(255,0,0,0.4)] hover:bg-red-600 active:scale-[0.99] transition-all duration-200"
+      >
         Kerékpár keresése →
       </button>
     </form>
