@@ -6,6 +6,13 @@ export interface Dealer {
   website: string;
 }
 
+export const normalizeCity = (city: string) =>
+  city
+    .trim()
+    .toLocaleLowerCase('hu-HU')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+
 export const dealersList: Dealer[] = [
   { city: 'Érd', name: 'Alfa Bike', address: '2030 Érd Bajcsy-Zsilinszky út 117.', email: 'info@alfabike.hu', website: 'https://alfabike.hu' },
   { city: 'Kisújszállás', name: 'Apacs Bike', address: '5310 Kisújszállás, Mikes utca 1.', email: 'info@apacsbike.hu', website: 'https://apacsbike.hu/' },
